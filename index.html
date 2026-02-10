@@ -66,8 +66,6 @@
       }
     }
 
-    checkVersionAndPurge();
-
     window.addEventListener("load", async function () {
       await checkVersionAndPurge();
       if ("serviceWorker" in navigator) {
@@ -109,7 +107,7 @@
       streamingAssetsUrl: "StreamingAssets",
       companyName: "Leviaworks",
       productName: "Seasiege",
-      productVersion: "0.4",
+      productVersion: "0.6",
       showBanner: unityShowBanner,
     };
 
