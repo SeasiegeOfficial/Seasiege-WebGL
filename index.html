@@ -8,6 +8,20 @@
   <link rel="shortcut icon" href="TemplateData/favicon.ico">
   <link rel="stylesheet" href="TemplateData/style.css">
   <link rel="manifest" href="manifest.webmanifest">
+
+  <style>
+    canvas:focus {
+      outline: none;
+    }
+
+    #unity-canvas {
+      -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    }
+
+    #unity-canvas:focus {
+      outline: none !important;
+    }
+  </style>
 </head>
 
 <body>
@@ -23,33 +37,41 @@
   </div>
 
   <script>
-    async function purgeObsoleteCaches() {
+    async function checkVersionAndPurge() {
       try {
-        const cacheNames = await caches.keys();
+        const response = await fetch('https://seasiege.com/version');
+        const data = await response.json();
+        const serverVersion = data.Version;
 
-        const targetCaches = cacheNames.filter(name =>
-          name.includes('Leviaworks') && !name.startsWith('UnityCache')
-        );
+        const localVersion = localStorage.getItem('version');
 
-        if (targetCaches.length > 1) {
-          const latestCache = targetCaches[targetCaches.length - 1];
-          const obsoleteCaches = targetCaches.slice(0, targetCaches.length - 1);
+        if (!localVersion || localVersion !== serverVersion) {
+          localStorage.setItem('version', serverVersion);
 
-          for (const cacheName of obsoleteCaches) {
-            await caches.delete(cacheName);
-          }
-
-          window.location.reload(true);
+          await purgeAllCaches();
+        } else {
         }
       } catch (error) {
       }
     }
 
-    purgeObsoleteCaches();
+    async function purgeAllCaches() {
+      try {
+        const cacheNames = await caches.keys();
+        await Promise.all(
+          cacheNames.map(cacheName => caches.delete(cacheName))
+        );
+        window.location.reload();
+      } catch (error) {
+      }
+    }
 
-    window.addEventListener("load", function () {
+    checkVersionAndPurge();
+
+    window.addEventListener("load", async function () {
+      await checkVersionAndPurge();
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("ServiceWorker.js");
+        await navigator.serviceWorker.register("ServiceWorker.js");
       }
     });
 
@@ -87,7 +109,7 @@
       streamingAssetsUrl: "StreamingAssets",
       companyName: "Leviaworks",
       productName: "Seasiege",
-      productVersion: "0.3",
+      productVersion: "0.4",
       showBanner: unityShowBanner,
     };
 
