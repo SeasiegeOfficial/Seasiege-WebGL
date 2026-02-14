@@ -22,15 +22,30 @@ self.addEventListener('fetch', function (e) {
     if (e.request.method !== 'GET') {
         return; 
     }
-    e.respondWith((async function () {
-      let response = await caches.match(e.request);
-      console.log(`[Service Worker] Fetching resource: ${e.request.url}`);
-      if (response) { return response; }
 
-      response = await fetch(e.request);
-      const cache = await caches.open(cacheName);
-      console.log(`[Service Worker] Caching new resource: ${e.request.url}`);
-      cache.put(e.request, response.clone());
-      return response;
+    const url = new URL(e.request.url);
+
+    const blacklistedUrls = [
+        'seasiege.com/version',
+        'cdn-cgi/rum'
+    ];
+
+    if (blacklistedUrls.some(path => url.href.includes(path))) {
+        console.log(`[Service Worker] Bypassing cache for: ${url.href}`);
+        return;
+    }
+
+    e.respondWith((async function () {
+        let response = await caches.match(e.request);
+        if (response) { return response; }
+
+        response = await fetch(e.request);
+        const cache = await caches.open(cacheName);
+        
+        if (response.status === 200) {
+            cache.put(e.request, response.clone());
+        }
+        
+        return response;
     })());
 });
