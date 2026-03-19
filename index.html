@@ -51,6 +51,7 @@
 
           await purgeAllCaches();
         } else {
+          await purgeAllCaches(); // this will be changed
         }
       } catch (error) {
       }
@@ -108,7 +109,7 @@
       streamingAssetsUrl: "StreamingAssets",
       companyName: "Leviaworks",
       productName: "Seasiege",
-      productVersion: "1.0.4.2",
+      productVersion: "1.0.4",
       showBanner: unityShowBanner,
     };
 
