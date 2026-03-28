@@ -1,4 +1,4 @@
-const cacheName = "Leviaworks-Seasiege-1.0.5";
+const cacheName = "Leviaworks-Seasiege-1.0.6";
 const contentToCache = [
     "Build/Web.loader.js",
     "Build/Web.framework.js",
